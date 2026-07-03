@@ -2,126 +2,186 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  // Android Emulator: 10.0.2.2
-  // Physical Device / iOS Simulator: machine ka IP
+  // Android Emulator use karo to: 10.0.2.2
+  // Physical device use karo to: apni machine ka IP
   static const String baseUrl = 'http://192.168.0.217:8080/api';
-  
+
   String? _token;
 
   void setToken(String token) {
     _token = token;
   }
 
-  Map<String, String> get _headers {
-    final headers = {
-      'Content-Type': 'application/json',
-    };
-    if (_token != null) {
-      headers['Authorization'] = 'Bearer $_token';
+  Map<String, String> get _headers => {
+        'Content-Type': 'application/json',
+        if (_token != null) 'Authorization': 'Bearer $_token',
+      };
+
+  // Response parse karo - error ho ya success
+  Map<String, dynamic> _parse(http.Response response) {
+    try {
+      final body = jsonDecode(response.body);
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return body;
+      } else {
+        // FastAPI error format: {"detail": "..."}
+        final detail = body['detail'] ?? body['error'] ?? 'Something went wrong';
+        return {'success': false, 'error': detail};
+      }
+    } catch (e) {
+      return {'success': false, 'error': 'Server error (${response.statusCode})'};
     }
-    return headers;
   }
 
-  // Auth APIs
+  // Auth
   Future<Map<String, dynamic>> register(String username, String email, String password) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/auth/register'),
-      headers: _headers,
-      body: jsonEncode({
-        'username': username,
-        'email': email,
-        'password': password,
-      }),
-    );
-    return jsonDecode(response.body);
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/auth/register'),
+        headers: _headers,
+        body: jsonEncode({'username': username, 'email': email, 'password': password}),
+      ).timeout(const Duration(seconds: 10));
+      return _parse(response);
+    } catch (e) {
+      return {'success': false, 'error': 'Cannot connect to server. Check your connection.'};
+    }
   }
 
   Future<Map<String, dynamic>> login(String username, String password) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/auth/login'),
-      headers: _headers,
-      body: jsonEncode({
-        'username': username,
-        'password': password,
-      }),
-    );
-    return jsonDecode(response.body);
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/auth/login'),
+        headers: _headers,
+        body: jsonEncode({'username': username, 'password': password}),
+      ).timeout(const Duration(seconds: 10));
+      return _parse(response);
+    } catch (e) {
+      return {'success': false, 'error': 'Cannot connect to server. Check your connection.'};
+    }
   }
 
-  // Task APIs
+  // Tasks
   Future<Map<String, dynamic>> getCategories() async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/tasks/categories'),
-      headers: _headers,
-    );
-    return jsonDecode(response.body);
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/tasks/categories'),
+        headers: _headers,
+      ).timeout(const Duration(seconds: 10));
+      return _parse(response);
+    } catch (e) {
+      return {'categories': []};
+    }
   }
 
   Future<Map<String, dynamic>> getTasksByCategory(int categoryId) async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/tasks/category/$categoryId'),
-      headers: _headers,
-    );
-    return jsonDecode(response.body);
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/tasks/category/$categoryId'),
+        headers: _headers,
+      ).timeout(const Duration(seconds: 10));
+      return _parse(response);
+    } catch (e) {
+      return {'tasks': []};
+    }
   }
 
   Future<Map<String, dynamic>> getTask(String taskId) async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/tasks/$taskId'),
-      headers: _headers,
-    );
-    return jsonDecode(response.body);
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/tasks/$taskId'),
+        headers: _headers,
+      ).timeout(const Duration(seconds: 10));
+      return _parse(response);
+    } catch (e) {
+      return {'error': 'Failed to load task'};
+    }
   }
 
   Future<Map<String, dynamic>> submitAnswer(String taskId, String answer, {int? timeTaken}) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/tasks/$taskId/submit'),
-      headers: _headers,
-      body: jsonEncode({'answer': answer, 'timeTaken': timeTaken}),
-    );
-    return jsonDecode(response.body);
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/tasks/$taskId/submit'),
+        headers: _headers,
+        body: jsonEncode({'answer': answer, 'timeTaken': timeTaken}),
+      ).timeout(const Duration(seconds: 10));
+      return _parse(response);
+    } catch (e) {
+      return {'correct': false, 'error': 'Failed to submit answer'};
+    }
   }
 
   Future<Map<String, dynamic>> getHint(String taskId, int hintLevel) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/tasks/$taskId/hint'),
-      headers: _headers,
-      body: jsonEncode({'hintLevel': hintLevel}),
-    );
-    return jsonDecode(response.body);
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/tasks/$taskId/hint'),
+        headers: _headers,
+        body: jsonEncode({'hintLevel': hintLevel}),
+      ).timeout(const Duration(seconds: 10));
+      return _parse(response);
+    } catch (e) {
+      return {'error': 'Failed to get hint'};
+    }
   }
 
-  // User APIs
+  Future<Map<String, dynamic>> getDailyChallenge() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/tasks/daily'),
+        headers: _headers,
+      ).timeout(const Duration(seconds: 10));
+      return _parse(response);
+    } catch (e) {
+      return {'challenge': null};
+    }
+  }
+
+  // User
   Future<Map<String, dynamic>> getUserProfile() async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/users/profile'),
-      headers: _headers,
-    );
-    return jsonDecode(response.body);
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/users/profile'),
+        headers: _headers,
+      ).timeout(const Duration(seconds: 10));
+      return _parse(response);
+    } catch (e) {
+      return {'user': null};
+    }
   }
 
   Future<Map<String, dynamic>> getUserProgress() async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/users/progress'),
-      headers: _headers,
-    );
-    return jsonDecode(response.body);
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/users/progress'),
+        headers: _headers,
+      ).timeout(const Duration(seconds: 10));
+      return _parse(response);
+    } catch (e) {
+      return {'progress': null};
+    }
   }
 
   Future<Map<String, dynamic>> getAchievements() async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/users/achievements'),
-      headers: _headers,
-    );
-    return jsonDecode(response.body);
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/users/achievements'),
+        headers: _headers,
+      ).timeout(const Duration(seconds: 10));
+      return _parse(response);
+    } catch (e) {
+      return {'achievements': []};
+    }
   }
 
-  // Leaderboard APIs
+  // Leaderboard
   Future<Map<String, dynamic>> getLeaderboard() async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/leaderboard/global'),
-      headers: _headers,
-    );
-    return jsonDecode(response.body);
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/leaderboard/global'),
+        headers: _headers,
+      ).timeout(const Duration(seconds: 10));
+      return _parse(response);
+    } catch (e) {
+      return {'leaderboard': []};
+    }
   }
 }

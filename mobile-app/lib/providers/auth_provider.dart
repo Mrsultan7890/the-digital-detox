@@ -66,7 +66,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
         final token = response['token'] as String;
         await _storage.write(key: _tokenKey, value: token);
         _apiService.setToken(token);
-
         state = state.copyWith(
           isAuthenticated: true,
           token: token,
@@ -76,13 +75,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
       } else {
         state = state.copyWith(
           isLoading: false,
-          error: response['error'] ?? 'Login failed',
+          error: response['error'] ?? response['detail'] ?? 'Login failed',
         );
       }
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: e.toString(),
+        error: 'Connection failed. Is the server running?',
       );
     }
   }
@@ -97,7 +96,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
         final token = response['token'] as String;
         await _storage.write(key: _tokenKey, value: token);
         _apiService.setToken(token);
-
         state = state.copyWith(
           isAuthenticated: true,
           token: token,
@@ -107,13 +105,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
       } else {
         state = state.copyWith(
           isLoading: false,
-          error: response['error'] ?? 'Registration failed',
+          error: response['error'] ?? response['detail'] ?? 'Registration failed',
         );
       }
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: e.toString(),
+        error: 'Connection failed. Is the server running?',
       );
     }
   }
