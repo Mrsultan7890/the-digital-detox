@@ -30,6 +30,17 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Initialize Flutter project
+        run: |
+          flutter create -t app --org com.digitaldetox --project-name digital_detox _flutter_init
+          cp -r _flutter_init/android mobile-app/android
+          cp -r _flutter_init/ios mobile-app/ios
+          cp -r _flutter_init/linux mobile-app/linux
+          cp -r _flutter_init/macos mobile-app/macos
+          cp -r _flutter_init/web mobile-app/web
+          cp -r _flutter_init/windows mobile-app/windows
+          rm -rf _flutter_init
+
       - name: Get dependencies
         working-directory: mobile-app
         run: flutter pub get
@@ -77,6 +88,13 @@ jobs:
           flutter-version: '3.19.0'
           channel: 'stable'
           cache: true
+
+      - name: Initialize Flutter project
+        run: |
+          flutter create -t app --org com.digitaldetox --project-name digital_detox _flutter_init
+          cp -r _flutter_init/android mobile-app/android
+          cp -r _flutter_init/ios mobile-app/ios
+          rm -rf _flutter_init
 
       - name: Get dependencies
         working-directory: mobile-app
