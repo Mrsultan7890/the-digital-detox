@@ -81,7 +81,7 @@ class TaskNotifier extends StateNotifier<TaskState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final result = await _apiService.submitAnswer(taskId, answer);
+      final result = await _apiService.submitAnswer(taskId, answer, timeTaken: timeTaken);
       state = state.copyWith(
         submitResult: result,
         isLoading: false,

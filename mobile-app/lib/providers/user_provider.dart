@@ -69,11 +69,10 @@ class UserProfileNotifier extends StateNotifier<UserProfileState> {
 
   Future<void> loadAchievements() async {
     try {
-      final response = await _apiService.getUserProgress();
+      final response = await _apiService.getAchievements();
       final achievements = (response['achievements'] as List?)
           ?.map((e) => e as Map<String, dynamic>)
           .toList() ?? [];
-      
       state = state.copyWith(achievements: achievements);
     } catch (e) {
       print('Error loading achievements: $e');

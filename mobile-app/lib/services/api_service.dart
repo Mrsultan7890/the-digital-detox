@@ -106,6 +106,14 @@ class ApiService {
     return jsonDecode(response.body);
   }
 
+  Future<Map<String, dynamic>> getAchievements() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/users/achievements'),
+      headers: _headers,
+    );
+    return jsonDecode(response.body);
+  }
+
   // Leaderboard APIs
   Future<Map<String, dynamic>> getLeaderboard() async {
     final response = await http.get(

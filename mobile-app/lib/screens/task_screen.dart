@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/task_provider.dart';
-import '../services/api_service.dart';
+import '../providers/auth_provider.dart';
 
 final taskDetailProvider = FutureProvider.family<Map<String, dynamic>, String>((ref, taskId) async {
   final api = ref.watch(apiServiceProvider);
