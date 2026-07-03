@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl = 'http://localhost:8080/api';
+  // Android Emulator: 10.0.2.2
+  // Physical Device / iOS Simulator: machine ka IP
+  static const String baseUrl = 'http://192.168.0.217:8080/api';
   
   String? _token;
 
