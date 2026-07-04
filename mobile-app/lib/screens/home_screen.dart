@@ -124,37 +124,52 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildDailyChallenge() {
     return Card(
       color: const Color(0xFF6C63FF),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            const Icon(Icons.calendar_today, color: Colors.white, size: 40),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Daily Challenge',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+      child: InkWell(
+        onTap: () async {
+          final api = ref.read(apiServiceProvider);
+          final response = await api.getDailyChallenge();
+          final challenge = response['challenge'];
+          if (challenge != null && mounted) {
+            context.push('/task/${challenge['task_id'] ?? challenge['id']}');
+          } else if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('No daily challenge available today')),
+            );
+          }
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              const Icon(Icons.calendar_today, color: Colors.white, size: 40),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Daily Challenge',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Complete today\'s challenge for bonus points!',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.9),
-                      fontSize: 14,
+                    const SizedBox(height: 4),
+                    Text(
+                      'Complete today\'s challenge for bonus points!',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.9),
+                        fontSize: 14,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const Icon(Icons.arrow_forward_ios, color: Colors.white),
-          ],
+              const Icon(Icons.arrow_forward_ios, color: Colors.white),
+            ],
+          ),
         ),
       ),
     );
