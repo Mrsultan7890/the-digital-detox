@@ -16,7 +16,9 @@ async def _get_conn():
     return conn
 
 
-async def query(sql: str, params: list = []) -> list[dict]:
+async def query(sql: str, params: list = None) -> list[dict]:
+    if params is None:
+        params = []
     async with aiosqlite.connect(DB_PATH) as conn:
         conn.row_factory = aiosqlite.Row
         await conn.execute("PRAGMA foreign_keys=ON")
@@ -25,7 +27,9 @@ async def query(sql: str, params: list = []) -> list[dict]:
             return [dict(row) for row in rows]
 
 
-async def execute(sql: str, params: list = []) -> int:
+async def execute(sql: str, params: list = None) -> int:
+    if params is None:
+        params = []
     async with aiosqlite.connect(DB_PATH) as conn:
         await conn.execute("PRAGMA foreign_keys=ON")
         cursor = await conn.execute(sql, params)
@@ -33,6 +37,6 @@ async def execute(sql: str, params: list = []) -> int:
         return cursor.rowcount
 
 
-async def query_one(sql: str, params: list = []) -> dict | None:
+async def query_one(sql: str, params: list = None) -> dict | None:
     results = await query(sql, params)
     return results[0] if results else None

@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  // Android Emulator use karo to: 10.0.2.2
-  // Physical device use karo to: apni machine ka IP
-  static const String baseUrl = 'http://192.168.0.217:8080/api';
+  // VMware server IP - apna actual IP yahan daalo
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://192.168.0.217:8080/api',
+  );
 
   String? _token;
 

@@ -48,11 +48,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
     final token = await _storage.read(key: _tokenKey);
     if (token != null) {
       _apiService.setToken(token);
-      state = state.copyWith(
-        isAuthenticated: true,
-        token: token,
-      );
-      await loadUserProfile();
+      state = state.copyWith(isAuthenticated: true, token: token);
+      final response = await _apiService.getUserProfile();
+      if (response['user'] != null) {
+        state = state.copyWith(user: response['user'] as Map<String, dynamic>);
+      } else {
+        // Token invalid/expired - logout karo
+        await logout();
+      }
     }
   }
 
@@ -118,19 +121,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> logout() async {
     await _storage.delete(key: _tokenKey);
+    _apiService.setToken('');
     state = AuthState();
   }
 
-  Future<void> loadUserProfile() async {
-    try {
-      final response = await _apiService.getUserProfile();
-      if (response['user'] != null) {
-        state = state.copyWith(user: response['user'] as Map<String, dynamic>);
-      }
-    } catch (e) {
-      print('Error loading user profile: $e');
+  void clearError() {
+    if (state.error != null) {
+      state = state.copyWith(error: null);
     }
   }
+
 }
 
 final apiServiceProvider = Provider((ref) => ApiService());

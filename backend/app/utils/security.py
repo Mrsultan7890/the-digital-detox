@@ -1,6 +1,6 @@
 import os
 import bcrypt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from jose import JWTError, jwt
 from dotenv import load_dotenv
 
@@ -23,7 +23,7 @@ def create_token(user_id: int, username: str) -> str:
     payload = {
         "userId": user_id,
         "username": username,
-        "exp": datetime.utcnow() + timedelta(days=EXPIRE_DAYS),
+        "exp": datetime.now(timezone.utc) + timedelta(days=EXPIRE_DAYS),
     }
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 

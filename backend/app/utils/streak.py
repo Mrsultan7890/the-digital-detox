@@ -16,14 +16,21 @@ async def update_streak(user_id: int):
     last_login = user["last_login"]
 
     if last_login:
-        last_date = datetime.fromisoformat(last_login).date()
-        diff = (today - last_date).days
-        if diff == 0:
-            return  # same day, no change
-        elif diff == 1:
-            current_streak += 1
+        try:
+            last_date = datetime.fromisoformat(last_login.replace(' ', 'T')).date()
+        except ValueError:
+            last_date = None
+
+        if last_date is None:
+            current_streak = 1
         else:
-            current_streak = 1  # streak broken
+            diff = (today - last_date).days
+            if diff == 0:
+                return
+            elif diff == 1:
+                current_streak += 1
+            else:
+                current_streak = 1
     else:
         current_streak = 1  # first login
 

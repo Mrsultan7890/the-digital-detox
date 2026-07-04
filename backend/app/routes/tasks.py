@@ -129,6 +129,8 @@ async def get_hint(task_id: int, body: HintRequest, user=Depends(get_current_use
     if not user_data or user_data["hint_coins"] < 1:
         raise HTTPException(status_code=403, detail="Not enough hint coins")
 
+    if body.hintLevel not in (1, 2, 3):
+        raise HTTPException(status_code=400, detail="Invalid hint level")
     hint_col = f"hint_{body.hintLevel}"
     task = await query_one(f"SELECT {hint_col} as hint FROM tasks WHERE id = ?", [task_id])
 

@@ -62,9 +62,7 @@ class UserProfileNotifier extends StateNotifier<UserProfileState> {
       state = state.copyWith(
         progress: response['progress'] as Map<String, dynamic>?,
       );
-    } catch (e) {
-      print('Error loading progress: $e');
-    }
+    } catch (_) {}
   }
 
   Future<void> loadAchievements() async {
@@ -74,9 +72,7 @@ class UserProfileNotifier extends StateNotifier<UserProfileState> {
           ?.map((e) => e as Map<String, dynamic>)
           .toList() ?? [];
       state = state.copyWith(achievements: achievements);
-    } catch (e) {
-      print('Error loading achievements: $e');
-    }
+    } catch (_) {}
   }
 
   Future<void> loadAll() async {

@@ -59,7 +59,7 @@ cat > .env << EOF
 PORT=8080
 TURSO_DATABASE_URL=libsql://your-database-url.turso.io
 TURSO_AUTH_TOKEN=your_auth_token_here
-JWT_SECRET=super_secret_change_in_production_12345
+JWT_SECRET=<your_strong_random_secret_here>
 EOF
 
 # Edit .env and paste your actual Turso URL and token
@@ -79,7 +79,7 @@ curl http://localhost:8080/health
 # Register user
 curl -X POST http://localhost:8080/api/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"username":"testuser","email":"test@example.com","password":"password123"}'
+  -d '{"username":"testuser","email":"test@example.com","password":"<your_password>"}'
 
 # You should get a token in response!
 ```

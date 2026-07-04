@@ -89,9 +89,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildStatItem(Icons.stars, '${user?['total_points'] ?? 0}', 'Points'),
-            _buildStatItem(Icons.local_fire_department, '${user?['current_streak'] ?? 0}', 'Streak'),
-            _buildStatItem(Icons.lightbulb, '${user?['hint_coins'] ?? 0}', 'Hints'),
+            _buildStatItem(Icons.stars, '${user?['totalPoints'] ?? 0}', 'Points'),
+            _buildStatItem(Icons.local_fire_department, '${user?['currentStreak'] ?? 0}', 'Streak'),
+            _buildStatItem(Icons.lightbulb, '${user?['hintCoins'] ?? 0}', 'Hints'),
           ],
         ),
       ),
